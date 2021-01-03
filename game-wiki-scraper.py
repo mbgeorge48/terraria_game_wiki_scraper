@@ -34,7 +34,7 @@ def getWebPage():
 
 def pullItems(box, role, gamestage):
     if not box.find_all("li"):
-        obj = {"name": box.find("p").text.replace("(", "").replace(")", "").rstrip(), "role": role, "url": URL+box.find("p").find("a")["href"], "imgPath": box.find("p").find("img")["src"], "category": box.find("div", attrs={"class": "title"}).text.lower(), "gameStageAvailable": gamestage}
+        obj = {"name": box.find("p").text.replace("(", "").replace(")", "").rstrip(), "role": role, "url": URL+box.find("p").find("a")["href"], "imgPath": (box.find("p").find("img")["src"].split(".png")[0]+".png"), "category": box.find("div", attrs={"class": "title"}).text.lower(), "gameStageAvailable": gamestage}
         ITEMLIST.append(obj)
     for item in box.find_all("li"):
         valid = True
@@ -53,7 +53,7 @@ def pullItems(box, role, gamestage):
             itemURLExtension = "unknown"
             valid = False
         try:
-            itemImgPath = item.find("img")["src"]
+            itemImgPath = item.find("img")["src"].split(".png")[0]+".png"
         except:
             itemImgPath = "unknown"
             valid = False
