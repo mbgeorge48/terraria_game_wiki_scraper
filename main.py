@@ -12,14 +12,16 @@ class GameWikiScraper:
     def __init__(self):
         self.square_bracket_trim = re.compile(r"\[.*?\]")
 
-        self.url = "https://terraria.fandom.com/wiki"
+        self.base_url = "https://terraria.fandom.com/wiki"
         self.all_items = list()
 
         self.fetchWebPage()
         self.filterData()
+        with open('items.json', 'w') as fp:
+            json.dump(self.all_items, fp, indent=2)
 
     def fetchWebPage(self):
-        r = requests.get(self.url+"/Guide:Class_setups")
+        r = requests.get(self.base_url+"/Guide:Class_setups")
         self.soup = BeautifulSoup(''.join(r.text), features="lxml")
 
     def filterData(self):
@@ -32,7 +34,6 @@ class GameWikiScraper:
                     "summoning", "summoner")
                 gamestage = self.gameStageConvert(
                     classContainer.findChildren()[0].text.lower())
-                print(role, gamestage)
                 for itemContainer in card.find_all("div", attrs={"class": "box"}):
                     self.pullItems(itemContainer, role, gamestage)
 
@@ -55,27 +56,34 @@ class GameWikiScraper:
         return gameStage.get(stage, 7)
 
     def pullItems(self, itemContainer, role, gamestage):
-        # Look for span rather than li!
         if not itemContainer.find_all("li"):
-            print(f"i'm an itemcontainer\n{itemContainer.find('p').text}\n\n")
-            this_item = {
-                "name": itemContainer.find("p").text.replace("(", "").replace(")", "").rstrip(),
-                "role": role, "url": self.url+itemContainer.find("p").find("a")["href"],
-                "imgPath": (itemContainer.find("p").find("img")["src"].split(".png")[0]+".png"),
-                "category": itemContainer.find("div", attrs={"class": "title"}).text.lower(),
-                "gameStageAvailable": gamestage}
-
-            self.all_items.append(this_item)
+            category = self.convertCategory(itemContainer.find(
+                "div", attrs={"class": "title"}).text.lower())
+            for span in itemContainer.find("p").find_all("span", attrs={"style": "display:block;margin:0.5em 0;"}):
+                name = span.find("a").get("title")
+                url_ext = span.find("a").get("href")
+                imageTag = span.find("a").find("img")
+                if hasattr(imageTag, "data-src") and imageTag.get("data-src"):
+                    imgPath = imageTag.get("data-src")
+                else:
+                    imgPath = imageTag.get("src")
+                this_item = {
+                    "name": name.replace("(", "").replace(")", "").rstrip(),
+                    "url": self.base_url+url_ext,
+                    "imgPath": imgPath.split(".png")[0] + ".png",
+                    "role": role,
+                    "category": category,
+                    "gameStageAvailable": gamestage}
+                self.all_items.append(this_item)
 
         for item in itemContainer.find_all("li"):
             valid = True
-            category = itemContainer.find(
-                "div", attrs={"class": "title"}).text.lower()
+            category = self.convertCategory(itemContainer.find(
+                "div", attrs={"class": "title"}).text.lower())
             try:
                 itemName = item.text.replace(
                     "(", "").replace(")", "").rstrip()
                 itemName = self.square_bracket_trim.sub("", itemName)
-
             except:
                 itemName = "unknown"
                 valid = False
@@ -93,11 +101,17 @@ class GameWikiScraper:
                 this_item = {
                     "name": itemName,
                     "role": role,
-                    "url": self.url+itemURLExtension,
+                    "url": self.base_url+itemURLExtension,
                     "imgPath": itemImgPath,
                     "category": category,
                     "gameStageAvailable": gamestage}
                 self.all_items.append(this_item)
+
+    def convertCategory(self, category):
+        if "buffs" in category:
+            return 'buffs'
+        else:
+            return category
 
 
 if __name__ == "__main__":
@@ -106,15 +120,9 @@ if __name__ == "__main__":
     print(f"Start time = {start_time}")
     try:
         GameWikiScraper()
-    except IOError:
-        print("Ran into issues reading/copying files")
-        print(
-            "Check you've got enough disk space/your folder permissions/your folder path"
-        )
     except KeyboardInterrupt:
         print("Goodbye")
-    except Exception as e:
-        print(e)
+
     finish_time = datetime.now().strftime(time_format)
     print(f"Finish time = {finish_time}")
     time_delta = datetime.strptime(finish_time, time_format) - datetime.strptime(
