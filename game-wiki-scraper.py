@@ -3,8 +3,9 @@ import requests
 import json
 import re
 
-URL = "https://terraria.gamepedia.com"
+URL = "https://terraria.fandom.com/wiki"
 SQUAREBRACKETTRIM = re.compile(r"\[.*?\]")
+
 
 ITEMLIST = []
 
@@ -34,7 +35,8 @@ def getWebPage():
 
 def pullItems(box, role, gamestage):
     if not box.find_all("li"):
-        obj = {"name": box.find("p").text.replace("(", "").replace(")", "").rstrip(), "role": role, "url": URL+box.find("p").find("a")["href"], "imgPath": (box.find("p").find("img")["src"].split(".png")[0]+".png"), "category": box.find("div", attrs={"class": "title"}).text.lower(), "gameStageAvailable": gamestage}
+        obj = {"name": box.find("p").text.replace("(", "").replace(")", "").rstrip(), "role": role, "url": URL+box.find("p").find("a")["href"], "imgPath": (
+            box.find("p").find("img")["src"].split(".png")[0]+".png"), "category": box.find("div", attrs={"class": "title"}).text.lower(), "gameStageAvailable": gamestage}
         ITEMLIST.append(obj)
     for item in box.find_all("li"):
         valid = True
@@ -65,13 +67,13 @@ def pullItems(box, role, gamestage):
 
 def gameStageConvert(gameStageValue):
     gameStage = {
-        "pre-bosses": "0",
-        "pre-hardmode": "1",
-        "pre-mech bosses": "2",
-        "pre-plantera": "3",
-        "pre-golem": "4",
-        "pre-lunar events": "5",
-        "endgame": "6"
+        "pre-bosses": 0,
+        "pre-hardmode": 1,
+        "pre-mech bosses": 2,
+        "pre-plantera": 3,
+        "pre-golem": 4,
+        "pre-lunar events": 5,
+        "endgame": 6
     }
     return gameStage.get(gameStageValue, "unknown")
 
