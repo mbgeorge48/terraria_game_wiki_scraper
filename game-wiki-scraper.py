@@ -57,17 +57,14 @@ class GameWikiScraper:
             category = self.convertCategory(item_container.find(
                 "div", attrs={"class": "title"}).text.lower())
             for span in item_container.find("p").find_all("span", attrs={"style": "display:block;margin:0.5em 0;"}):
-                name = span.find("a").get("title")
+                name = span.find("a").get("title").replace("(", "").replace(")", "").rstrip()
                 url_ext = span.find("a").get("href")
-                imageTag = span.find("a").find("img")
-                if hasattr(imageTag, "data-src") and imageTag.get("data-src"):
-                    imgPath = imageTag.get("data-src")
-                else:
-                    imgPath = imageTag.get("src")
+                img_path = self.compareImgSrc(span.find("a").find("img"))
+
                 this_item = {
-                    "name": name.replace("(", "").replace(")", "").rstrip(),
+                    "name": name,
                     "url": self.base_url+url_ext,
-                    "imgPath": imgPath.split(".png")[0] + ".png",
+                    "imgPath": img_path,
                     "role": role,
                     "category": category,
                     "gameStageAvailable": game_stage}
@@ -78,28 +75,28 @@ class GameWikiScraper:
             category = self.convertCategory(item_container.find(
                 "div", attrs={"class": "title"}).text.lower())
             try:
-                item_name = item.text.replace(
+                name = item.text.replace(
                     "(", "").replace(")", "").rstrip()
-                item_name = self.square_bracket_trim.sub("", item_name)
+                name = self.square_bracket_trim.sub("", name)
             except:
-                item_name = "unknown"
+                name = "unknown"
                 valid = False
             try:
-                item_url_extension = item.find("a")["href"]
+                url_ext = item.find("a")["href"]
             except:
-                item_url_extension = "unknown"
+                url_ext = "unknown"
                 valid = False
             try:
-                item_img_path = item.find("img")["src"].split(".png")[0]+".png"
+                img_path = self.compareImgSrc(item.find("img"))
             except:
-                item_img_path = "unknown"
+                img_path = "unknown"
                 valid = False
             if valid:
                 this_item = {
-                    "name": item_name,
+                    "name": name,
                     "role": role,
-                    "url": self.base_url+item_url_extension,
-                    "imgPath": item_img_path,
+                    "url": self.base_url+url_ext,
+                    "imgPath": img_path,
                     "category": category,
                     "gameStageAvailable": game_stage}
                 self.all_items.append(this_item)
@@ -109,6 +106,14 @@ class GameWikiScraper:
             return 'buffs'
         else:
             return category
+
+    def compareImgSrc(self, image_tag):
+        if hasattr(image_tag, "data-src") and image_tag.get("data-src") and image_tag.get("data-src").split(':')[0] != 'data' :
+            path = image_tag.get("data-src")
+        else:
+            path = image_tag.get("src")
+        print(path.split(".png")[0] + ".png")
+        return path.split(".png")[0] + ".png"
 
 
 if __name__ == "__main__":

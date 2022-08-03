@@ -87,4 +87,6 @@ However the data can be extracted in quite a simular way
 
 #### Known Issues / Future Features
 
-When extracting the `imgPath` there are two `attributes` that contain the path. `img.src` and `img.data-src`. I haven't fully explored it yet however sometimes both, one or none of those contain an encoded path which I'm unable to use.
+~~When extracting the `imgPath` there are two `attributes` that contain the path. `img.src` and `img.data-src`. I haven't fully explored it yet however sometimes both, one or none of those contain an encoded path which I'm unable to use.~~ - fixed 03/08/2022
+
+Would like to integrate something like `Flask` or `Django` to expose a simple API so other apps can utilise the JSON
