@@ -69,17 +69,17 @@ The `role`, `category` and `gameStageAvailable` are found from the parent contai
 Sometimes items appear in the HTML as:
 
 ```html
-<li style="xyz"><span class="abc">
+<li style="xyz">
+  <span class="abc">
+    <a href="url" title="Item Name">
+      <img alt="Item Name" src="img path" data-src="img path" class="abc" />
+    </a>
     <span>
-        <a href="url" title="Item Name">
-            <img alt="Item Name" src="img path" data-src="img path" class="abc" />
-        </a>
-        <span>
-            <span>
-                <a href="url" title="Item Name ">Item Name</a>
-            </span>
-        </span>
+      <span>
+        <a href="url" title="Item Name ">Item Name</a>
+      </span>
     </span>
+  </span>
 </li>
 ```
 
