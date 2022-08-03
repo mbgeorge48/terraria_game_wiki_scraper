@@ -72,7 +72,7 @@ Sometimes items appear in the HTML as:
 <li style="xyz">
   <span class="abc">
     <a href="url" title="Item Name">
-      <img alt="Item Name" src="img path" data-src="img path" class="abc" />
+      <img alt="Item Name" src="img path" data-src="img path" class="abc" ... />
     </a>
     <span>
       <span>
