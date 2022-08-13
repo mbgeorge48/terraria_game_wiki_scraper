@@ -9,7 +9,7 @@ class GameWikiScraper:
     def __init__(self):
         self.square_bracket_trim = re.compile(r"\[.*?\]")
 
-        self.base_url = "https://terraria.fandom.com/wiki"
+        self.base_url = "https://terraria.fandom.com/"
         self.all_items = list()
 
         self.fetchWebPage()
@@ -18,7 +18,7 @@ class GameWikiScraper:
             json.dump(self.all_items, fp, indent=2)
 
     def fetchWebPage(self):
-        r = requests.get(self.base_url+"/Guide:Class_setups")
+        r = requests.get(self.base_url+"/wiki/Guide:Class_setups")
         self.soup = BeautifulSoup(''.join(r.text), features="lxml")
 
     def filterData(self):
@@ -78,17 +78,17 @@ class GameWikiScraper:
                 name = item.text.replace(
                     "(", "").replace(")", "").rstrip()
                 name = self.square_bracket_trim.sub("", name)
-            except:
+            except (TypeError, AttributeError):
                 name = "unknown"
                 valid = False
             try:
                 url_ext = item.find("a")["href"]
-            except:
+            except (TypeError, AttributeError):
                 url_ext = "unknown"
                 valid = False
             try:
                 img_path = self.compareImgSrc(item.find("img"))
-            except:
+            except (TypeError, AttributeError):
                 img_path = "unknown"
                 valid = False
             if valid:
@@ -112,7 +112,6 @@ class GameWikiScraper:
             path = image_tag.get("data-src")
         else:
             path = image_tag.get("src")
-        print(path.split(".png")[0] + ".png")
         return path.split(".png")[0] + ".png"
 
 
