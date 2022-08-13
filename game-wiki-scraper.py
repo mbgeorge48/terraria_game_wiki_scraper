@@ -134,6 +134,8 @@ class GameWikiScraper:
             path = image_tag.get("data-src")
         else:
             path = image_tag.get("src")
+        if "gif" in path:
+            return path.split(".gif")[0] + ".gif"
         return path.split(".png")[0] + ".png"
 
 
