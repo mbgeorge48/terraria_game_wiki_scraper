@@ -2,6 +2,8 @@
 
 This is a simple script that should be paired with the single page app, Terraria Classes Guide ([GitHub repo](https://github.com/mbgeorge48/terraria_classes))
 
+**Since my latest changes to this repo I've migrated the `game-wiki-scraper.py` file into the bigger repo mentioned in the previous paragraph, I wont archive this though as if anyone stumbles upon this repo they're experiment and play with it**
+
 ## Setup
 
 _The setup for this script isn't strict so feel free to setup the way you normally would. otherwise..._
